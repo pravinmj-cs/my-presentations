@@ -1,0 +1,47 @@
+image: node:10.19
+
+stages:
+  - Build
+  - Deploy
+
+
+Build Job:
+  stage: Build
+  tags:
+    - python
+  script:
+    - ls
+    - npm cache clean --force
+    - rm -rf node_modules
+    - npm install
+    - npm run build
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - build
+
+Deploy_Dev:
+   stage: Deploy
+   tags:
+    - python
+   environment:
+    name: development
+   before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ls
+    - ssh-keyscan 68.183.224.53 > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.email "praveen@niyatainfotech.com"
+    - git config --global user.name "praveen"
+    - apt-get update -qq && apt-get install -y -qq rsync
+   script:
+    - rsync -a --progress --human-readable build/ root@68.183.224.53:/home/temp/energy_management/build;
+    - ssh -T root@68.183.224.53
+       "ls;
+        systemctl restart nginx;
+        exit;"
+

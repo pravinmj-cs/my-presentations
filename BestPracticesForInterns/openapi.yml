@@ -1,0 +1,124 @@
+---
+openapi: 3.0.2
+info:
+  title: FastAPI
+  version: 0.1.0
+paths: "/api/sensordata/add/":
+    post:
+      tags:
+      - Meter
+      summary: Insert sensor data
+      description: Inserts sensor data for processing based on the request body fields
+      operationId: add_meter_data_api_sensordata_add__post
+      requestBody:
+        content:
+          application/json:
+            schema: "$ref": "#/components/schemas/MeterData"
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema: "$ref": "#/components/schemas/HTTPValidationError"
+components:
+  schemas:
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items: "$ref": "#/components/schemas/ValidationError"
+    MeterData:
+      title: MeterData
+      required:
+      - measurements
+      type: object
+      properties:
+        measurements:
+          title: Measurements
+          type: array
+          items: "$ref": "#/components/schemas/MeterSchema"
+    MeterSchema:
+      title: MeterSchema
+      required:
+      - device_name
+      - measurement_time
+      - current[A
+]
+      - voltage[V
+]
+      - power[W
+]
+      - power_factor
+      - energy[Wh
+]
+      type: object
+      properties:
+        device_name:
+          title: Device Name
+          type: string
+        measurement_time:
+          title: Measurement Time
+          type: string
+        current[A
+]:
+          title: Current[A
+]
+          type: number
+        voltage[V
+]:
+          title: Voltage[V
+]
+          type: number
+        power[W
+]:
+          title: Power[W
+]
+          type: number
+        power_factor:
+          title: Power Factor
+          type: number
+        energy[Wh
+]:
+          title: Energy[Wh
+]
+          type: number
+      example:
+        device_name: Foo
+        measurement_time: '2015-10-25T10: 45: 00Z'
+        current[A
+]: '35.4'
+        voltage[V
+]: '39.2'
+        power[W
+]: '23.23'
+        power_factor: '2.0'
+        energy[Wh
+]: '1.1'
+    ValidationError:
+      title: ValidationError
+      required:
+      - loc
+      - msg
+      - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            type: string
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string

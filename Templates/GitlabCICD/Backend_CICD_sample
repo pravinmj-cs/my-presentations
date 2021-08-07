@@ -1,0 +1,72 @@
+image: python:3.8
+
+stages:
+  - Code Quality
+  - Security Scan
+  - Deploy
+
+before_script:
+    - python -V  # Print out python version for debugging
+
+services:
+    - postgres:12
+
+variables:
+    POSTGRES_DB: 5g_local_test
+    POSTGRES_USER: 5g_local_tesuser
+    POSTGRES_PASSWORD: 5g_local_testpwd
+
+cache:
+  paths:
+    - ~/.cache/pip/
+
+PEP8:
+  stage: Code Quality
+  tags:
+    - python
+  script:
+    - pip3 install flake8
+    - cd five_g_backend;
+    - flake8 . --statistics --count
+
+
+Security Check:
+  stage: Security Scan
+  tags:
+    - python
+
+  script:
+    - export SECRET_KEY="$SECRET_KEY"
+    - pip install -r requirements.txt
+    - cd five_g_backend;
+    - python manage.py check --deploy
+  only:
+    - development
+
+
+Deploy_Dev:
+   stage: Deploy
+   tags:
+    - python
+   environment:
+    name: development
+   before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ls
+    - ssh-keyscan 68.183.224.53 > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.email "praveen@niyatainfotech.com"
+    - git config --global user.name "praveen"
+   script:
+    - ssh -T root@68.183.224.53
+       "ls;
+        cd /home/webapps/5g_backend/5g_backend;
+        ./deploy.sh;
+        exit;"
+   only:
+    - development
+
