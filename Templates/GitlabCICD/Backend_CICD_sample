@@ -12,9 +12,9 @@ services:
     - postgres:12
 
 variables:
-    POSTGRES_DB: 5g_local_test
-    POSTGRES_USER: 5g_local_tesuser
-    POSTGRES_PASSWORD: 5g_local_testpwd
+    POSTGRES_DB: local_test
+    POSTGRES_USER: local_tesuser
+    POSTGRES_PASSWORD: local_testpwd
 
 cache:
   paths:
@@ -38,7 +38,7 @@ Security Check:
   script:
     - export SECRET_KEY="$SECRET_KEY"
     - pip install -r requirements.txt
-    - cd five_g_backend;
+    - cd backend;
     - python manage.py check --deploy
   only:
     - development
@@ -57,14 +57,14 @@ Deploy_Dev:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ls
-    - ssh-keyscan 68.183.224.53 > ~/.ssh/known_hosts
+    - ssh-keyscan "$SSH_PRIVATE_IP" > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - git config --global user.email "praveen@niyatainfotech.com"
+    - git config --global user.email "praveenmj.cs@gmail.com"
     - git config --global user.name "praveen"
    script:
     - ssh -T root@68.183.224.53
        "ls;
-        cd /home/webapps/5g_backend/5g_backend;
+        cd /home/webapps/backend/;
         ./deploy.sh;
         exit;"
    only:

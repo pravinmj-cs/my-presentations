@@ -33,14 +33,14 @@ Deploy_Dev:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ls
-    - ssh-keyscan 68.183.224.53 > ~/.ssh/known_hosts
+    - ssh-keyscan "$SSH_PRIVATE_KEY > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - git config --global user.email "praveen@niyatainfotech.com"
+    - git config --global user.email "praveenmj.cs@gmail.com"
     - git config --global user.name "praveen"
     - apt-get update -qq && apt-get install -y -qq rsync
    script:
-    - rsync -a --progress --human-readable build/ root@68.183.224.53:/home/temp/energy_management/build;
-    - ssh -T root@68.183.224.53
+    - rsync -a --progress --human-readable build/ admin_user@"$SSH_PRIVATE_IP":/home/temp/energy_management/build;
+    - ssh -T admin_user@"$SSH_PRIVATE_IP"
        "ls;
         systemctl restart nginx;
         exit;"
